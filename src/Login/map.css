@@ -1,0 +1,25 @@
+* {
+  padding: 0px;
+  margin: 0px;
+}
+
+#outlined-basic {
+  padding: 5px;
+  margin: 5px;
+  font-size: 20px;
+  color: rgb(0, 0, 0);
+  background-color: white;
+}
+
+#digite {
+  padding: 10px;
+  margin: 5px;
+  font-size: 20px;
+  color: #000000;
+}
+
+#map {
+  height: 500px;
+  width: 1000px;
+  margin: 20px;
+}
