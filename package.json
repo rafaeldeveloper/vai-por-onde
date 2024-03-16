@@ -13,9 +13,12 @@
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.0",
     "@mui/material": "^5.15.11",
+    "cep-promise": "^4.4.1",
     "leaflet": "^1.9.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-leaflet": "^4.2.1",
+    "react-mentions": "^4.4.10",
     "yarn": "^1.22.21"
   },
   "devDependencies": {
