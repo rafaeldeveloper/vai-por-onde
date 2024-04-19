@@ -1,98 +1,54 @@
 import React, { useState } from 'react';
-import { Autocomplete, Button, Drawer, Grid, SwipeableDrawer, TextField } from '@mui/material';
-import L, { Circle } from 'leaflet';
+import { Button, Grid, SwipeableDrawer, TextField } from '@mui/material';
 import 'leaflet/dist/leaflet.css';
 import './map.css';
-import cep from 'cep-promise';
-import { MentionsInput, Mention } from 'react-mentions';
+
+import CloseIcon from '@mui/icons-material/Close';
 
 const MapComponent = () => {
   const [endereco, setEndereco] = useState('');
   const [resultado, setResultado] = useState('');
   const [map, setMap] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [inputText, setInputText] = useState('');
+  const [savedTexts, setSavedTexts] = useState([]);
 
-  const [open, setOpen] = React.useState(false);
-  var isCircleEvent = false;
-
-
-  const toggleDrawer = (newOpen) => () => {
-    setOpen(newOpen);
-  };
-
-  const circleClick = () => {
-    isCircleEvent = true;
-    console.log("circulo clicado")
-    setOpen(true);
-
-  }
-
-
-
-
-  const drawCircle = (position, map) => {
-    console.log(isCircleEvent, "circleClicked")
-
-    if (!isCircleEvent) {
-      L.circle(position, 100).addTo(map).on("click", circleClick);
-
-    }
-
-
-
-
-  }
-
-
-  const pesquisarEndereco = () => {
-    then(response => response.json())
-      .then(data => {
-        if (data && data.length > 0) {
-          const resultado = data[0];
-          const lat = parseFloat(resultado.lat);
-          const lon = parseFloat(resultado.lon);
-
-          setResultado(
-            <div>
-              <p>Rua: {resultado.display_name}</p>
-              <p>Latitude: {lat}</p>
-              <p>Longitude: {lon}</p>
-            </div>
-          );
-
-          if (map) {
-            L.marker([lat, lon]).addTo(map);
-            map.setView([lat, lon], 15); // 15 é o nível de zoom
-          }
-        } else {
-          setResultado('Endereço não encontrado');
-        }
-      })
-      .catch(error => console.error('Erro ao buscar dados de geocodificação:', error));
+  const toggleDrawer = () => {
+    setOpen(!open);
   };
 
   const handleInputChange = (e) => {
-    setEndereco(e.target.value);
+    setInputText(e.target.value);
+  };
+
+  const clearInputText = () => {
+    setInputText('');
+  };
+
+  const handleSendButtonClick = () => {
+    // Adiciona o texto digitado à lista de textos salvos
+    setSavedTexts([...savedTexts, inputText]);
+    clearInputText();
+  };
+
+  const handleClearButtonClick = () => {
+    // Limpa o texto digitado e os textos salvos
+    clearInputText();
+    setSavedTexts([]);
   };
 
   const handleMapRef = (ref) => {
     setMap(ref);
 
-
     let latitude = 0;
     let longitude = 0;
 
-
-
-
     if ("geolocation" in navigator) {
-      // Get the user's current location
       navigator.geolocation.getCurrentPosition(function (position) {
-        // The user's latitude and longitude are in position.coords.latitude and position.coords.longitude
         latitude = position.coords.latitude;
         longitude = position.coords.longitude;
 
         console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
-
 
         if (ref && !map) {
           const initialMap = L.map(ref.id).setView([latitude, longitude], 15);
@@ -111,35 +67,14 @@ const MapComponent = () => {
               console.log("this is the second message");
               drawCircle(popLocation, initialMap);
               setOpen(true);
-
             }
-
-
 
             setTimeout(() => {
               isCircleEvent = false;
             }, 3000);
-
-            // setCir
-            // setOpen(true)
-
-            // console.log(popLocation, "popLocation");
-            // var popup = L.popup()
-            // .setLatLng(popLocation)
-            // .setContent('<p>Hello world!<br />This is a nice popup.</p>')
-            // .openOn(map);        
           });
-
-
         }
-
-
-
       }, function (error) {
-        // Handle errors, if any
-
-        console.log("carregou")
-
         switch (error.code) {
           case error.PERMISSION_DENIED:
             console.error("User denied the request for geolocation.");
@@ -158,36 +93,60 @@ const MapComponent = () => {
     } else {
       console.error("Geolocation is not available in this browser.");
     }
-
-
   };
 
-  console.log(open, "open")
-  const users = [
-    {
-      id: 'walter',
-      display: 'Walter White',
-    },
+  const drawCircle = (position, map) => {
+    console.log(isCircleEvent, "circleClicked")
 
-  ]
+    if (!isCircleEvent) {
+      L.circle(position, 100).addTo(map).on("click", circleClick);
+    }
+  };
+
+  const circleClick = () => {
+    isCircleEvent = true;
+    console.log("circulo clicado")
+    setOpen(true);
+  };
+
+  let isCircleEvent = false;
+
   return (
     <div>
-
       <Grid item md={12}>
-
-        <SwipeableDrawer style={{ margin: "10px", width: "600px" }} anchor="bottom" open={open} onClose={toggleDrawer(false)}>
-
+        <SwipeableDrawer style={{ margin: "10px", width: "600px" }} anchor="bottom" open={open} onClose={toggleDrawer}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 16px', borderBottom: '1px solid #ccc' }}>
+            <div>
+              <h3>Chat</h3>
+            </div>
+            <div>
+              <CloseIcon
+                onClick={toggleDrawer}
+                className="close-icon"
+                style={{ cursor: 'pointer', color: '#FF0000' }}
+              />
+            </div>
+          </div>
           <TextField
             style={{ margin: "10px" }}
             helperText=" "
             id="demo-helper-text-aligned-no-helper"
-            label="Conte-nos o que esta acontecendo"
+            label="Conte-nos o que está acontecendo"
+            value={inputText}
+            onChange={handleInputChange}
           />
+          <div style={{ margin: "10px" }}>
+            <Button variant="contained" color="success" onClick={handleSendButtonClick}>
+              Enviar
+            </Button>
+            <Button variant="contained" color="error" onClick={handleClearButtonClick}>
+              Limpar
+            </Button>
+          </div>
 
-
-          <Button variant="contained" color="success" onClick={() => setOpen(false)}>
-            Enviar
-          </Button>
+          {savedTexts.map((text, index) => (
+            <div key={index} style={{ margin: "10px" }}>{text}</div>
+          ))}
         </SwipeableDrawer>
       </Grid>
       <div id="resultado">{resultado}</div>

@@ -5,9 +5,7 @@ import SwipeableEdgeDrawer from "./chatmap/chat.jsx";
 function App() {
   return (
     <>
-    <MapComponent></MapComponent>
-      <SwipeableEdgeDrawer>
-      </SwipeableEdgeDrawer>
+   <MapComponent></MapComponent>
     </>
   );
 }
